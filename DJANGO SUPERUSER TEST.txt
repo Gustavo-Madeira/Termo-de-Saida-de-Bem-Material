@@ -1,0 +1,5 @@
+DJANGO SUPERUSER TEST 
+
+name: administrator
+email: ati@ceperj.rj.gov.br
+password: C3P3RJ2@2!
