@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Novo Termo</title>
+  <style>
+    body{font-family:Arial;margin:24px}
+    label{display:block;margin-top:12px}
+    input{padding:10px;border:1px solid #ccc;border-radius:10px;width:340px}
+    .btn{display:inline-block;padding:10px 14px;border:1px solid #111;border-radius:10px;text-decoration:none;color:#111;margin-top:16px}
+    button{padding:10px 14px;border:1px solid #111;border-radius:10px;background:#111;color:#fff;margin-top:16px}
+  </style>
+</head>
+<body>
+  <h1>Registrar Saída (Novo Termo)</h1>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Salvar Termo</button>
+    <a class="btn" href="/">Voltar</a>
+  </form>
+</body>
+</html>

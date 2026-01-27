@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Termos</title>
+  <style>
+    body{font-family:Arial;margin:24px}
+    table{border-collapse:collapse;width:100%}
+    th,td{border:1px solid #ddd;padding:10px}
+    th{background:#f5f5f5;text-align:left}
+    .badge{padding:4px 8px;border:1px solid #111;border-radius:999px;font-size:12px}
+  </style>
+</head>
+<body>
+  <h1>Termos de Saída</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nº Termo</th>
+        <th>Data Retirada</th>
+        <th>Destino</th>
+        <th>Status</th>
+        <th>Criado em</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in termos %}
+      <tr>
+        <td>{{ t.numero }}</td>
+        <td>{{ t.data_retirada }}</td>
+        <td>{{ t.destino }}</td>
+        <td><span class="badge">{{ t.status }}</span></td>
+        <td>{{ t.criado_em }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5">Nenhum termo criado ainda.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>
+<a class="btn" href="{% url 'termo_novo' %}">+ Registrar Saída</a>
+<a class="btn" href="/accounts/logout/">Sair</a>
