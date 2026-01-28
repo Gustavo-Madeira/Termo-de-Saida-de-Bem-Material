@@ -1,45 +1,91 @@
+{% load static %}
 <!doctype html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Termos</title>
+  <meta charset="utf-8">
+  <title>Termo de Saída de Bem Patrimonial</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body{font-family:Arial;margin:24px}
-    table{border-collapse:collapse;width:100%}
-    th,td{border:1px solid #ddd;padding:10px}
-    th{background:#f5f5f5;text-align:left}
-    .badge{padding:4px 8px;border:1px solid #111;border-radius:999px;font-size:12px}
+    body{font-family:Arial, sans-serif; background:#f6f7fb; margin:0;}
+    .wrap{max-width:1100px; margin:0 auto; padding:22px;}
+    .top{background:#fff; border-bottom:1px solid #e6e8ef;}
+    .top .wrap{display:flex; align-items:center; justify-content:space-between; gap:16px;}
+    .brand{display:flex; align-items:center; gap:14px;}
+    .brand img{height:48px; width:auto;}
+    .title h1{margin:0; font-size:24px; text-align:center;}
+    .title p{margin:6px 0 0; color:#667085; font-size:13px; text-align:center;}
+    .actions{display:flex; gap:10px; align-items:center;}
+    .btn{border:1px solid #e6e8ef; background:#fff; padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:600;}
+    .btn.primary{background:#0b1220; color:#fff; border-color:#0b1220;}
+    table{width:100%; border-collapse:collapse; background:#fff; border:1px solid #e6e8ef; border-radius:14px; overflow:hidden;}
+    th,td{padding:12px 12px; border-bottom:1px solid #eef0f5; text-align:left; font-size:14px;}
+    th{color:#475467; background:#fafbff; font-weight:700;}
+    .pill{display:inline-block; padding:6px 10px; border-radius:999px; font-weight:800; font-size:12px;}
+    .pill.aberto{background:#e6efff; color:#1d4ed8; border:1px solid #bfdbfe;}
+    .pill.devolvido{background:#e9fbe7; color:#15803d; border:1px solid #bbf7d0;}
+    .muted{color:#667085;}
   </style>
 </head>
 <body>
-  <h1>Termos de Saída</h1>
+  <div class="top">
+    <div class="wrap">
+      <div class="brand">
+        <img src="{% static 'logo.png' %}" alt="CEPERJ">
+      </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Nº Termo</th>
-        <th>Data Retirada</th>
-        <th>Destino</th>
-        <th>Status</th>
-        <th>Criado em</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for t in termos %}
-      <tr>
-        <td>{{ t.numero }}</td>
-        <td>{{ t.data_retirada }}</td>
-        <td>{{ t.destino }}</td>
-        <td><span class="badge">{{ t.status }}</span></td>
-        <td>{{ t.criado_em }}</td>
-      </tr>
-      {% empty %}
-      <tr><td colspan="5">Nenhum termo criado ainda.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
+      <div class="title" style="flex:1;">
+        <h1>Termo de Saída de Bem Patrimonial</h1>
+        <p>Controle de retirada e devolução de bens patrimoniais</p>
+      </div>
+
+      <div class="actions">
+        <a class="btn primary" href="{% url 'registrar_saida' %}">+ Registrar Saída</a>
+        <a class="btn" href="{% url 'editar_saidas' %}">Editar Saídas</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Data de Retirada</th>
+          <th>Destino</th>
+          <th>Responsável</th>
+          <th>Produto</th>
+          <th>Patrimônio</th>
+          <th>Status</th>
+          <th>Data de Devolução</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in termos %}
+          <tr>
+            <td>{{ t.data_retirada|date:"d/m/Y" }}</td>
+            <td>{{ t.destino }}</td>
+            <td>{{ t.responsavel_nome }}</td>
+            <td>{{ t.produto|default:"—" }}</td>
+            <td>{{ t.patrimonio|default:"—" }}</td>
+            <td>
+              {% if t.status == "DEVOLVIDO" %}
+                <span class="pill devolvido">DEVOLVIDO</span>
+              {% else %}
+                <span class="pill aberto">ABERTO</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if t.data_devolucao %}
+                {{ t.data_devolucao|date:"d/m/Y" }}
+              {% else %}
+                <span class="muted">—</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="7" class="muted">Nenhuma saída registrada ainda.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </body>
 </html>
-<a class="btn" href="{% url 'termo_novo' %}">+ Registrar Saída</a>
-<a class="btn" href="/accounts/logout/">Sair</a>

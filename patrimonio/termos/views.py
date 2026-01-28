@@ -1,36 +1,78 @@
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import user_passes_test
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
-from .models import TermoSaida, ItemTermo
-from .forms import RegistrarSaidaForm
+from .forms import EditarSaidaForm, RegistrarSaidaForm
+from .models import TermoSaida
 
 
-@login_required
-def home(request):
-    termos = TermoSaida.objects.order_by("-criado_em")
+def admin_required(view_func):
+    return user_passes_test(lambda u: u.is_authenticated and u.is_staff, login_url="login")(view_func)
+
+
+def termo_list_publico(request):
+    # Página inicial: SEM login
+    termos = TermoSaida.objects.all()
     return render(request, "termo_list.html", {"termos": termos})
 
 
-@login_required
-def termo_novo(request):
+@admin_required
+def registrar_saida(request):
     if request.method == "POST":
         form = RegistrarSaidaForm(request.POST)
         if form.is_valid():
-            # cria o termo
             termo = form.save(commit=False)
-            termo.criado_por = request.user
+
+            # Se informou data_devolucao, vira DEVOLVIDO; senão, ABERTO
+            if termo.data_devolucao:
+                termo.status = TermoSaida.STATUS_DEVOLVIDO
+            else:
+                termo.status = TermoSaida.STATUS_ABERTO
+
             termo.save()
-
-            # cria o item (produto/bem) atrelado ao termo
-            ItemTermo.objects.create(
-                termo=termo,
-                patrimonio_num=form.cleaned_data["patrimonio_num"],
-                descricao_bem=form.cleaned_data["descricao_bem"],
-                assinatura_retirada=form.cleaned_data["responsavel_nome"],  # opcional
-            )
-
-            return redirect("home")
+            return redirect("termo_list")
     else:
         form = RegistrarSaidaForm()
 
-    return render(request, "termo_forma.html", {"form": form})
+    return render(request, "termo_form.html", {"form": form, "titulo": "Registrar Saída"})
+
+
+@admin_required
+def editar_saidas_list(request):
+    # Tela de gerenciamento (admin) listando tudo com Editar/Excluir
+    termos = TermoSaida.objects.all()
+    return render(request, "termo_manage_list.html", {"termos": termos})
+
+
+@admin_required
+def editar_saida(request, pk: int):
+    termo = get_object_or_404(TermoSaida, pk=pk)
+
+    if request.method == "POST":
+        form = EditarSaidaForm(request.POST, instance=termo)
+        if form.is_valid():
+            termo = form.save(commit=False)
+
+            # Se status DEVOLVIDO e não tem data_devolucao, força data_devolucao hoje? (opcional)
+            # Aqui vou só manter coerência simples:
+            if termo.status == TermoSaida.STATUS_DEVOLVIDO and not termo.data_devolucao:
+                # deixa em branco se você quiser permitir devolvido sem data
+                pass
+
+            if termo.data_devolucao:
+                termo.status = TermoSaida.STATUS_DEVOLVIDO
+
+            termo.save()
+            return redirect("editar_saidas")
+    else:
+        form = EditarSaidaForm(instance=termo)
+
+    return render(request, "termo_form.html", {"form": form, "titulo": "Editar Saída"})
+
+
+@admin_required
+@require_POST
+def excluir_saida(request, pk: int):
+    termo = get_object_or_404(TermoSaida, pk=pk)
+    termo.delete()
+    return redirect("editar_saidas")

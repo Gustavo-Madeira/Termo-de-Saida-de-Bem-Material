@@ -1,0 +1,110 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Editar Termo</title>
+
+  <style>
+    body{margin:0;font-family:Arial,sans-serif;background:#f6f7fb;color:#111827}
+    .wrap{max-width:860px;margin:28px auto;padding:0 16px}
+    .card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 10px 25px rgba(0,0,0,.06);overflow:hidden}
+    .header{display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px;border-bottom:1px solid #e5e7eb}
+    .logo{height:60px;width:auto}
+    h1{margin:0;font-size:22px;font-weight:900;text-align:center}
+    .sub{margin:0;color:#6b7280;font-size:13px;text-align:center}
+
+    .content{padding:18px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+    label{font-weight:800;font-size:13px}
+    input, select{
+      padding:10px 12px;border:1px solid #e5e7eb;border-radius:12px;font-size:14px;outline:none;
+    }
+    input:focus, select:focus{border-color:#111827}
+
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .btn{padding:10px 14px;border-radius:12px;border:1px solid #e5e7eb;background:#fff;font-weight:900;text-decoration:none;color:#111827;cursor:pointer}
+    .btn.primary{background:#111827;color:#fff;border-color:#111827}
+  </style>
+
+  <script>
+    function toggleDevolucao() {
+      const status = document.getElementById("id_status");
+      const devolucao = document.getElementById("id_data_devolucao");
+      if (!status || !devolucao) return;
+
+      if (status.value === "DEVOLVIDO") {
+        devolucao.disabled = false;
+      } else {
+        devolucao.disabled = true;
+        devolucao.value = "";
+      }
+    }
+
+    window.addEventListener("load", toggleDevolucao);
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="header">
+        <img class="logo" src="{% static 'logo.png' %}" alt="CEPERJ">
+        <div>
+          <h1>Editar Termo {{ termo.numero }}</h1>
+          <p class="sub">Corrija dados, marque devolução ou cancele o termo.</p>
+        </div>
+      </div>
+
+      <div class="content">
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="row">
+            <div class="field">
+              <label for="id_data_retirada">Data da retirada</label>
+              {{ form.data_retirada }}
+            </div>
+
+            <div class="field">
+              <label for="id_status">Status</label>
+              {{ form.status }}
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="id_destino">Destino</label>
+              {{ form.destino }}
+            </div>
+
+            <div class="field">
+              <label for="id_responsavel_nome">Responsável</label>
+              {{ form.responsavel_nome }}
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="id_data_devolucao">Data de devolução</label>
+            {{ form.data_devolucao }}
+            <small style="color:#6b7280">Habilita automaticamente quando Status = DEVOLVIDO.</small>
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" type="submit">Salvar</button>
+            <a class="btn" href="{% url 'home' %}?modo=editar">Voltar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const status = document.getElementById("id_status");
+    if(status){
+      status.addEventListener("change", toggleDevolucao);
+    }
+  </script>
+</body>
+</html>

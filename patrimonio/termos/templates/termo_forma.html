@@ -1,25 +1,73 @@
 <!doctype html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Novo Termo</title>
+  <meta charset="utf-8">
+  <title>{{ titulo }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body{font-family:Arial;margin:24px}
-    label{display:block;margin-top:12px}
-    input{padding:10px;border:1px solid #ccc;border-radius:10px;width:340px}
-    .btn{display:inline-block;padding:10px 14px;border:1px solid #111;border-radius:10px;text-decoration:none;color:#111;margin-top:16px}
-    button{padding:10px 14px;border:1px solid #111;border-radius:10px;background:#111;color:#fff;margin-top:16px}
+    body{font-family:Arial, sans-serif; background:#f6f7fb; margin:0;}
+    .wrap{max-width:900px; margin:0 auto; padding:22px;}
+    .card{background:#fff; border:1px solid #e6e8ef; border-radius:16px; padding:18px;}
+    .grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+    label{font-weight:700; display:block; margin-bottom:6px;}
+    input, select{width:100%; padding:10px 12px; border:1px solid #e6e8ef; border-radius:12px; font-size:14px;}
+    .actions{display:flex; gap:10px; justify-content:flex-end; margin-top:16px;}
+    .btn{border:1px solid #e6e8ef; background:#fff; padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:700; text-decoration:none; color:#111827;}
+    .btn.primary{background:#0b1220; color:#fff; border-color:#0b1220;}
+    .full{grid-column:1/-1;}
   </style>
 </head>
 <body>
-  <h1>Registrar Saída (Novo Termo)</h1>
+  <div class="wrap">
+    <h2 style="margin:0 0 14px;">{{ titulo }}</h2>
 
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Salvar Termo</button>
-    <a class="btn" href="/">Voltar</a>
-  </form>
+    <form method="post" class="card">
+      {% csrf_token %}
+
+      <div class="grid">
+        <div>
+          <label>Data de Retirada</label>
+          {{ form.data_retirada }}
+        </div>
+
+        <div>
+          <label>Destino</label>
+          {{ form.destino }}
+        </div>
+
+        <div>
+          <label>Responsável</label>
+          {{ form.responsavel_nome }}
+        </div>
+
+        <div>
+          <label>Produto</label>
+          {{ form.produto }}
+        </div>
+
+        <div>
+          <label>Patrimônio</label>
+          {{ form.patrimonio }}
+        </div>
+
+        <div>
+          <label>Data de Devolução</label>
+          {{ form.data_devolucao }}
+        </div>
+
+        {% if form.status %}
+          <div class="full">
+            <label>Status</label>
+            {{ form.status }}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="actions">
+        <a class="btn" href="{% url 'termo_list' %}">Voltar</a>
+        <button class="btn primary" type="submit">Salvar</button>
+      </div>
+    </form>
+  </div>
 </body>
 </html>

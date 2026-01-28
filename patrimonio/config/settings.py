@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'termos',
 ]
 
+STATIC_URL = 'static/'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -117,6 +119,6 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-LOGIN_URL = "/accounts/login/"
+LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/accounts/login/"
+LOGOUT_REDIRECT_URL = "/"

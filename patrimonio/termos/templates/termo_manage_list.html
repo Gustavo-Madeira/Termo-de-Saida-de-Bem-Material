@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <title>Editar Saídas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body{font-family:Arial, sans-serif; background:#f6f7fb; margin:0;}
+    .wrap{max-width:1100px; margin:0 auto; padding:22px;}
+    .top{display:flex; justify-content:space-between; align-items:center; gap:12px;}
+    .btn{border:1px solid #e6e8ef; background:#fff; padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:600; text-decoration:none; color:#111827;}
+    .btn.primary{background:#0b1220; color:#fff; border-color:#0b1220;}
+    table{width:100%; border-collapse:collapse; background:#fff; border:1px solid #e6e8ef; border-radius:14px; overflow:hidden; margin-top:14px;}
+    th,td{padding:12px 12px; border-bottom:1px solid #eef0f5; text-align:left; font-size:14px;}
+    th{color:#475467; background:#fafbff; font-weight:700;}
+    .actions{display:flex; gap:8px;}
+    .danger{border-color:#fecaca; color:#b91c1c;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <h2 style="margin:0;">Editar Saídas</h2>
+      <div class="actions">
+        <a class="btn" href="{% url 'termo_list' %}">Voltar</a>
+        <a class="btn primary" href="{% url 'registrar_saida' %}">+ Registrar Saída</a>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Data de Retirada</th>
+          <th>Destino</th>
+          <th>Responsável</th>
+          <th>Produto</th>
+          <th>Patrimônio</th>
+          <th>Status</th>
+          <th>Devolução</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in termos %}
+          <tr>
+            <td>{{ t.data_retirada|date:"d/m/Y" }}</td>
+            <td>{{ t.destino }}</td>
+            <td>{{ t.responsavel_nome }}</td>
+            <td>{{ t.produto|default:"—" }}</td>
+            <td>{{ t.patrimonio|default:"—" }}</td>
+            <td>{{ t.status }}</td>
+            <td>{% if t.data_devolucao %}{{ t.data_devolucao|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+            <td>
+              <div class="actions">
+                <a class="btn" href="{% url 'editar_saida' t.id %}">Editar</a>
+
+                <form method="post" action="{% url 'excluir_saida' t.id %}" onsubmit="return confirm('Deseja excluir mesmo?');">
+                  {% csrf_token %}
+                  <button class="btn danger" type="submit">Excluir</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="8">Nada para editar ainda.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
