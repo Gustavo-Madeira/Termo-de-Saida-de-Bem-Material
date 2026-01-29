@@ -8,13 +8,13 @@ class TermoSaidaAdmin(admin.ModelAdmin):
         "id",
         "data_retirada",
         "destino",
-        "responsavel_nome",
+        "responsavel",
         "produto",
         "patrimonio",
         "status",
         "data_devolucao",
         "criado_em",
     )
-    list_filter = ("status", "data_retirada", "data_devolucao", "destino")
-    search_fields = ("destino", "responsavel_nome", "produto", "patrimonio")
+    list_filter = ("status", "data_retirada", "destino")
+    search_fields = ("destino", "responsavel", "produto", "patrimonio")
     ordering = ("-criado_em",)

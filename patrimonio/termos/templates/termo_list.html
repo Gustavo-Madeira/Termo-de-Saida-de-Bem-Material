@@ -1,91 +1,119 @@
 {% load static %}
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Termo de Saída de Bem Patrimonial</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body{font-family:Arial, sans-serif; background:#f6f7fb; margin:0;}
-    .wrap{max-width:1100px; margin:0 auto; padding:22px;}
-    .top{background:#fff; border-bottom:1px solid #e6e8ef;}
-    .top .wrap{display:flex; align-items:center; justify-content:space-between; gap:16px;}
-    .brand{display:flex; align-items:center; gap:14px;}
-    .brand img{height:48px; width:auto;}
-    .title h1{margin:0; font-size:24px; text-align:center;}
-    .title p{margin:6px 0 0; color:#667085; font-size:13px; text-align:center;}
-    .actions{display:flex; gap:10px; align-items:center;}
-    .btn{border:1px solid #e6e8ef; background:#fff; padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:600;}
-    .btn.primary{background:#0b1220; color:#fff; border-color:#0b1220;}
-    table{width:100%; border-collapse:collapse; background:#fff; border:1px solid #e6e8ef; border-radius:14px; overflow:hidden;}
-    th,td{padding:12px 12px; border-bottom:1px solid #eef0f5; text-align:left; font-size:14px;}
-    th{color:#475467; background:#fafbff; font-weight:700;}
-    .pill{display:inline-block; padding:6px 10px; border-radius:999px; font-weight:800; font-size:12px;}
-    .pill.aberto{background:#e6efff; color:#1d4ed8; border:1px solid #bfdbfe;}
-    .pill.devolvido{background:#e9fbe7; color:#15803d; border:1px solid #bbf7d0;}
-    .muted{color:#667085;}
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --border:#e6e8f0;
+      --text:#0f172a;
+      --muted:#64748b;
+      --primary:#0b1220;
+      --badge-bg:#eef2ff;
+      --badge-text:#1d4ed8;
+      --badge-ok-bg:#e8fff0;
+      --badge-ok-text:#047857;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
+    .wrap{max-width:1100px;margin:28px auto;padding:0 18px}
+    .header{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+    .logo{height:64px;object-fit:contain}
+    h1{margin:0;font-size:28px;font-weight:800}
+    .subtitle{margin:0;color:var(--muted)}
+    .toolbar{width:100%;display:flex;justify-content:space-between;align-items:center;margin-top:18px}
+    .btns{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{
+      display:inline-flex;align-items:center;gap:8px;
+      background:var(--primary);color:#fff;text-decoration:none;
+      padding:10px 14px;border-radius:12px;font-weight:700;
+      box-shadow:0 10px 25px rgba(2,6,23,.08);
+    }
+    .btn.secondary{background:#fff;color:var(--primary);border:1px solid var(--border);box-shadow:none}
+    .user{color:var(--muted);font-size:14px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-top:14px;overflow:hidden}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:12px 14px;border-bottom:1px solid var(--border);text-align:left;font-size:14px;vertical-align:middle}
+    th{background:#fafafa;font-weight:800;color:#111827}
+    tr:last-child td{border-bottom:none}
+    .badge{
+      display:inline-flex;align-items:center;justify-content:center;
+      padding:4px 10px;border-radius:999px;font-weight:800;font-size:12px;
+      background:var(--badge-bg);color:var(--badge-text);border:1px solid #c7d2fe;
+    }
+    .badge.ok{background:var(--badge-ok-bg);color:var(--badge-ok-text);border:1px solid #a7f3d0}
+    .empty{padding:18px;color:var(--muted)}
+    @media (max-width: 860px){
+      .logo{height:54px}
+      h1{font-size:22px}
+      th,td{padding:10px 10px}
+    }
   </style>
 </head>
 <body>
-  <div class="top">
-    <div class="wrap">
-      <div class="brand">
-        <img src="{% static 'logo.png' %}" alt="CEPERJ">
-      </div>
+  <div class="wrap">
+    <div class="header">
+      <img class="logo" src="{% static 'logo.png' %}" alt="CEPERJ" />
+      <h1>Termo de Saída de Bem Patrimonial</h1>
+      <p class="subtitle">Controle de retirada e devolução de bens patrimoniais</p>
+    </div>
 
-      <div class="title" style="flex:1;">
-        <h1>Termo de Saída de Bem Patrimonial</h1>
-        <p>Controle de retirada e devolução de bens patrimoniais</p>
+    <div class="toolbar">
+      <div class="btns">
+        <a class="btn" href="{% url 'registrar_saida' %}">+ Registrar Saída</a>
+        <a class="btn secondary" href="{% url 'editar_list' %}">Editar Saídas</a>
       </div>
-
-      <div class="actions">
-        <a class="btn primary" href="{% url 'registrar_saida' %}">+ Registrar Saída</a>
-        <a class="btn" href="{% url 'editar_saidas' %}">Editar Saídas</a>
+      <div class="user">
+        {% if request.user.is_authenticated %}
+          Usuário: <b>{{ request.user.username }}</b>
+        {% else %}
+          Visualização pública
+        {% endif %}
       </div>
     </div>
-  </div>
 
-  <div class="wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Data de Retirada</th>
-          <th>Destino</th>
-          <th>Responsável</th>
-          <th>Produto</th>
-          <th>Patrimônio</th>
-          <th>Status</th>
-          <th>Data de Devolução</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for t in termos %}
+    <div class="card">
+      {% if termos %}
+      <table>
+        <thead>
+          <tr>
+            <th>Data de Retirada</th>
+            <th>Destino</th>
+            <th>Responsável</th>
+            <th>Produto</th>
+            <th>Patrimônio</th>
+            <th>Status</th>
+            <th>Data de Devolução</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in termos %}
           <tr>
             <td>{{ t.data_retirada|date:"d/m/Y" }}</td>
             <td>{{ t.destino }}</td>
-            <td>{{ t.responsavel_nome }}</td>
+            <td>{{ t.responsavel }}</td>
             <td>{{ t.produto|default:"—" }}</td>
             <td>{{ t.patrimonio|default:"—" }}</td>
             <td>
               {% if t.status == "DEVOLVIDO" %}
-                <span class="pill devolvido">DEVOLVIDO</span>
+                <span class="badge ok">DEVOLVIDO</span>
               {% else %}
-                <span class="pill aberto">ABERTO</span>
+                <span class="badge">ABERTO</span>
               {% endif %}
             </td>
-            <td>
-              {% if t.data_devolucao %}
-                {{ t.data_devolucao|date:"d/m/Y" }}
-              {% else %}
-                <span class="muted">—</span>
-              {% endif %}
-            </td>
+            <td>{% if t.data_devolucao %}{{ t.data_devolucao|date:"d/m/Y" }}{% else %}—{% endif %}</td>
           </tr>
-        {% empty %}
-          <tr><td colspan="7" class="muted">Nenhuma saída registrada ainda.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+        <div class="empty">Nenhuma saída registrada ainda.</div>
+      {% endif %}
+    </div>
   </div>
 </body>
 </html>

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Editar Termo</title>
+  <title>{{ titulo }}</title>
   <style>
     :root{
       --bg:#f5f7fb; --card:#fff; --border:#e6e8f0; --text:#0f172a; --muted:#64748b;
@@ -13,10 +13,11 @@
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
     .wrap{max-width:980px;margin:28px auto;padding:0 18px}
-    .header{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;margin-bottom:14px}
-    .logo{height:64px;object-fit:contain}
-    h1{margin:0;font-size:26px;font-weight:900}
-    .subtitle{margin:0;color:var(--muted)}
+    .header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:12px}
+    .left{display:flex;align-items:center;gap:12px}
+    .logo{height:44px;object-fit:contain}
+    h1{margin:0;font-size:24px;font-weight:900}
+    .user{color:var(--muted);font-size:14px}
     .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px}
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     .field label{display:block;font-weight:800;margin:0 0 6px}
@@ -34,21 +35,26 @@
       border:1px solid var(--border);background:#fff;color:var(--primary);cursor:pointer;
     }
     .btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
-    @media (max-width: 760px){ .grid{grid-template-columns:1fr} }
+    @media (max-width: 760px){
+      .grid{grid-template-columns:1fr}
+      .header{flex-direction:column;align-items:flex-start}
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="header">
-      <img class="logo" src="{% static 'logo.png' %}" alt="CEPERJ" />
-      <h1>Editar Termo</h1>
-      <p class="subtitle">Corrija dados, marque devolução ou cancele o termo.</p>
+      <div class="left">
+        <img class="logo" src="{% static 'logo.png' %}" alt="CEPERJ" />
+        <h1>{{ titulo }}</h1>
+      </div>
+      <div class="user">Usuário: <b>{{ request.user.username }}</b></div>
     </div>
 
     <div class="card">
       {% if form.errors %}
         <div class="errors">
-          <b>Não foi possível salvar:</b>
+          <b>Corrija os campos abaixo:</b>
           {{ form.errors }}
         </div>
       {% endif %}
@@ -60,69 +66,40 @@
           <div class="field">
             <label for="{{ form.data_retirada.id_for_label }}">{{ form.data_retirada.label }}</label>
             {{ form.data_retirada }}
-          </div>
-
-          <div class="field">
-            <label for="{{ form.status.id_for_label }}">{{ form.status.label }}</label>
-            {{ form.status }}
+            <div class="help">Selecione a data em que o bem foi retirado.</div>
           </div>
 
           <div class="field">
             <label for="{{ form.destino.id_for_label }}">{{ form.destino.label }}</label>
             {{ form.destino }}
+            <div class="help">Ex.: Diretoria, setor ou local de destino.</div>
           </div>
 
           <div class="field">
             <label for="{{ form.responsavel.id_for_label }}">{{ form.responsavel.label }}</label>
             {{ form.responsavel }}
+            <div class="help">Nome de quem pegou o bem.</div>
           </div>
 
           <div class="field">
             <label for="{{ form.produto.id_for_label }}">{{ form.produto.label }}</label>
             {{ form.produto }}
-          </div>
-
-          <div class="field">
-            <label for="{{ form.patrimonio.id_for_label }}">{{ form.patrimonio.label }}</label>
-            {{ form.patrimonio }}
+            <div class="help">Ex.: Notebook, Monitor, Impressora, etc.</div>
           </div>
 
           <div class="field" style="grid-column: span 2;">
-            <label for="{{ form.data_devolucao.id_for_label }}">{{ form.data_devolucao.label }}</label>
-            {{ form.data_devolucao }}
-            <div class="help">{{ form.data_devolucao.help_text }}</div>
+            <label for="{{ form.patrimonio.id_for_label }}">{{ form.patrimonio.label }}</label>
+            {{ form.patrimonio }}
+            <div class="help">Número do patrimônio/etiqueta do bem.</div>
           </div>
         </div>
 
         <div class="actions">
-          <a class="btn" href="{% url 'editar_list' %}">Voltar</a>
+          <a class="btn" href="{% url 'termo_list_publico' %}">Voltar</a>
           <button class="btn primary" type="submit">Salvar</button>
         </div>
       </form>
     </div>
   </div>
-
-  <script>
-    function toggleDevolucao() {
-      const status = document.getElementById("id_status");
-      const dataDev = document.getElementById("id_data_devolucao");
-      if (!status || !dataDev) return;
-
-      if (status.value === "DEVOLVIDO") {
-        dataDev.disabled = false;
-        dataDev.required = true;
-      } else {
-        dataDev.value = "";
-        dataDev.required = false;
-        dataDev.disabled = true;
-      }
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      toggleDevolucao();
-      const status = document.getElementById("id_status");
-      if (status) status.addEventListener("change", toggleDevolucao);
-    });
-  </script>
 </body>
 </html>
