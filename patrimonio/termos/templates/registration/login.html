@@ -1,33 +1,189 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body{font-family:Arial, sans-serif; background:#f6f7fb; margin:0; display:flex; min-height:100vh; align-items:center; justify-content:center;}
-    .card{background:#fff; border:1px solid #e6e8ef; border-radius:16px; padding:18px; width:360px;}
-    label{font-weight:700; display:block; margin:10px 0 6px;}
-    input{width:100%; padding:10px 12px; border:1px solid #e6e8ef; border-radius:12px; font-size:14px;}
-    .btn{margin-top:14px; width:100%; background:#0b1220; color:#fff; border:1px solid #0b1220; padding:10px 14px; border-radius:12px; font-weight:800; cursor:pointer;}
-    .muted{color:#667085; font-size:13px;}
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card {
+      background: #fff;
+      width: 100%;
+      max-width: 420px;
+      padding: 22px;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.08);
+    }
+
+    h1 {
+      margin: 0 0 16px 0;
+      text-align: center;
+      font-size: 22px;
+      color: #111827;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    label {
+      font-size: 14px;
+      color: #374151;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      outline: none;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    input[type="text"]:focus, input[type="password"]:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+    }
+
+    .field {
+      width: 100%;
+    }
+
+    /* Linha da senha com botão olho */
+    .password-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .password-wrap input {
+      padding-right: 44px; /* espaço pro botão */
+    }
+
+    .toggle-pass {
+      position: absolute;
+      right: 8px;
+      height: 34px;
+      width: 34px;
+      border: none;
+      border-radius: 10px;
+      background: #f3f4f6;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+    }
+
+    .toggle-pass:hover {
+      background: #e5e7eb;
+    }
+
+    .toggle-pass:active {
+      transform: scale(0.98);
+    }
+
+    .btn {
+      margin-top: 4px;
+      width: 100%;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 10px;
+      background: #2563eb;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn:hover { background: #1d4ed8; }
+
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      border: 1px solid #fecaca;
+      margin-bottom: 10px;
+    }
+
+    .small {
+      text-align: center;
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
-  <form method="post" class="card">
-    <h2 style="margin:0;">Login</h2>
-    <p class="muted" style="margin:8px 0 0;">Acesso necessário para Registrar/Editar.</p>
+  <div class="card">
+    <h1>Login (Administrador)</h1>
 
-    {% csrf_token %}
-    {{ form.non_field_errors }}
+    {% if form.errors %}
+      <div class="error">
+        Usuário ou senha inválidos. Tente novamente.
+      </div>
+    {% endif %}
 
-    <label>Usuário</label>
-    {{ form.username }}
+    <form method="post">
+      {% csrf_token %}
 
-    <label>Senha</label>
-    {{ form.password }}
+      <div class="field">
+        <label for="id_username">Usuário</label>
+        <input type="text" name="username" id="id_username" autocomplete="username" required />
+      </div>
 
-    <button class="btn" type="submit">Entrar</button>
-  </form>
+      <div class="field">
+        <label for="id_password">Senha</label>
+
+        <div class="password-wrap">
+          <input type="password" name="password" id="id_password" autocomplete="current-password" required />
+
+          <button type="button" class="toggle-pass" id="togglePass" aria-label="Mostrar senha" title="Mostrar senha">
+            <!-- Ícone olho (SVG) -->
+            <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24">
+              <path stroke="#111827" stroke-width="2" d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/>
+              <path stroke="#111827" stroke-width="2" d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {% if next %}
+        <input type="hidden" name="next" value="{{ next }}">
+      {% endif %}
+
+      <button class="btn" type="submit">Entrar</button>
+
+      <div class="small">Acesso restrito ao administrador</div>
+    </form>
+  </div>
+
+  <script>
+    (function () {
+      const passInput = document.getElementById("id_password");
+      const toggleBtn = document.getElementById("togglePass");
+
+      toggleBtn.addEventListener("click", () => {
+        const isPassword = passInput.type === "password";
+        passInput.type = isPassword ? "text" : "password";
+
+        toggleBtn.setAttribute("aria-label", isPassword ? "Ocultar senha" : "Mostrar senha");
+        toggleBtn.setAttribute("title", isPassword ? "Ocultar senha" : "Mostrar senha");
+      });
+    })();
+  </script>
 </body>
 </html>

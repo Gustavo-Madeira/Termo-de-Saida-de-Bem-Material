@@ -1,20 +1,12 @@
 from pathlib import Path
-import os
-import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get("SECRET_KEY", "change-me")  # Render vai setar essa env var
-DEBUG = os.environ.get("DEBUG", "False") == "True"
+SECRET_KEY = "dev-secret-key"
+DEBUG = True
 
-RENDER_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
-if RENDER_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_HOSTNAME)
+ALLOWED_HOSTS = []
 
-CSRF_TRUSTED_ORIGINS = []
-if RENDER_HOSTNAME:
-    CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_HOSTNAME}")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -23,12 +15,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
+    # seu app
     "termos",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # ✅ WhiteNoise aqui
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -42,10 +35,18 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+
+        # ✅ isso aqui permite templates globais em /templates (opcional, mas bom)
+        "DIRS": [BASE_DIR / "templates"],
+
+        # ✅ ISSO É O MAIS IMPORTANTE:
+        # com APP_DIRS=True o Django procura dentro de:
+        # termos/templates/...
         "APP_DIRS": True,
+
         "OPTIONS": {
             "context_processors": [
+                "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
@@ -56,35 +57,29 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-# Banco: Render vai fornecer DATABASE_URL (Postgres)
 DATABASES = {
-    "default": dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600,
-    )
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
 }
-
-AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
-]
 
 LANGUAGE_CODE = "pt-br"
 TIME_ZONE = "America/Sao_Paulo"
 USE_I18N = True
 USE_TZ = True
 
-# ✅ Static correto em produção
-STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_URL = "static/"
+STATICFILES_DIRS = [
+    BASE_DIR / "static",      # opcional: static global
+]
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# WhiteNoise storage (cache + manifest)
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
+# ✅ LOGIN
 LOGIN_URL = "/login/"
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "/editar/"
 LOGOUT_REDIRECT_URL = "/"
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+# SESSION_COOKIE_AGE = 5  # por exemplo
+SESSION_SAVE_EVERY_REQUEST = True

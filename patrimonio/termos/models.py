@@ -1,45 +1,60 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 
 class TermoSaida(models.Model):
     STATUS_ABERTO = "ABERTO"
     STATUS_DEVOLVIDO = "DEVOLVIDO"
-
     STATUS_CHOICES = [
         (STATUS_ABERTO, "Aberto"),
         (STATUS_DEVOLVIDO, "Devolvido"),
     ]
 
-    data_retirada = models.DateField("Data de Retirada")
-    destino = models.CharField("Destino", max_length=120)
+    data_retirada = models.DateField()
+    destino = models.CharField(max_length=100)
+    responsavel = models.CharField(max_length=100)
+    produto = models.CharField(max_length=100)
+    patrimonio = models.CharField(max_length=100)
 
-    responsavel = models.CharField("Responsável", max_length=120, default="Não informado")
-    produto = models.CharField("Produto", max_length=120, blank=True, default="")
-    patrimonio = models.CharField("Patrimônio", max_length=60, blank=True, default="")
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default=STATUS_ABERTO,
+    )
+    data_devolucao = models.DateField(null=True, blank=True)
 
-    status = models.CharField("Status", max_length=10, choices=STATUS_CHOICES, default=STATUS_ABERTO)
-    data_devolucao = models.DateField("Data de Devolução", null=True, blank=True)
-
-    criado_em = models.DateTimeField("Criado em", auto_now_add=True)
-    atualizado_em = models.DateTimeField("Atualizado em", auto_now=True)
-
-    class Meta:
-        ordering = ["-criado_em"]
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
 
     def clean(self):
-        if self.status == self.STATUS_DEVOLVIDO and not self.data_devolucao:
-            raise ValidationError({"data_devolucao": "Informe a data de devolução quando o status for DEVOLVIDO."})
+        # Normaliza destino em maiúsculo
+        if self.destino:
+            self.destino = self.destino.upper()
 
+        # Regras de devolução
         if self.status == self.STATUS_ABERTO:
             self.data_devolucao = None
 
+        if self.status == self.STATUS_DEVOLVIDO and not self.data_devolucao:
+            raise ValidationError(
+                {"data_devolucao": "Informe a data de devolução para status DEVOLVIDO."}
+            )
+
     def save(self, *args, **kwargs):
+        """
+        Safety-net: garante que atualizado_em nunca vá NULL,
+        mesmo se teu banco estiver com esquema “antigo/bugado”.
+        """
+        if not self.criado_em:
+            self.criado_em = timezone.now()
+        self.atualizado_em = timezone.now()
+
         self.full_clean()
         return super().save(*args, **kwargs)
 
+    class Meta:
+        ordering = ["-data_retirada", "-id"]
+
     def __str__(self):
-        base = f"{self.produto or 'Bem'}"
-        if self.patrimonio:
-            base += f" ({self.patrimonio})"
-        return f"{base} - {self.responsavel} [{self.get_status_display()}]"
+        return f"{self.produto} ({self.patrimonio}) - {self.status}"
