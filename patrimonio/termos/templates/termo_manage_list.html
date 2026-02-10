@@ -1,37 +1,33 @@
 <!doctype html>
 <html lang="pt-br">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Editar Saídas</title>
-  <style>
-    body { font-family: Arial, sans-serif; background:#f5f6f8; margin:0; padding:24px; }
-    .wrap { max-width: 1100px; margin: 0 auto; }
-    .top { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px; }
-    .btn { padding:10px 14px; border-radius:10px; border:0; cursor:pointer; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; }
-    .btn-primary { background:#111827; color:#fff; }
-    .btn-ghost { background:#eef2ff; color:#111827; }
-    .card { background:#fff; border-radius:14px; padding:14px; box-shadow: 0 10px 25px rgba(0,0,0,.08); overflow:auto; }
-    table { width:100%; border-collapse:collapse; min-width: 980px; }
-    th, td { text-align:left; padding:10px 10px; border-bottom:1px solid #eef0f4; font-size: 14px; }
-    th { font-size: 13px; color:#374151; background:#fafafa; position:sticky; top:0; }
-    .badge { padding:6px 10px; border-radius:999px; font-weight:800; font-size: 12px; display:inline-block; }
-    .aberto { background:#e0f2fe; color:#075985; }
-    .devolvido { background:#dcfce7; color:#166534; }
-    .actions { display:flex; gap:8px; }
-    .btn-small { padding:8px 10px; border-radius:10px; font-weight:800; }
-    .btn-edit { background:#111827; color:#fff; }
-    .btn-del { background:#fee2e2; color:#991b1b; border:0; }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <div class="top">
-      <a class="btn btn-ghost" href="{% url 'home' %}">Voltar</a>
-      <a class="btn btn-primary" href="{% url 'registrar_saida' %}">Registrar Saída</a>
-    </div>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Editar Saídas</title>
+    <style>
+      body { font-family: Arial, sans-serif; background:#f5f5f5; margin:0; padding:0; }
+      .container { max-width: 1100px; margin: 30px auto; background:#fff; padding: 24px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+      h1 { margin:0 0 16px 0; text-align:center; }
+      .actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:16px; }
+      .btn { padding:10px 14px; border-radius:8px; font-weight:700; text-decoration:none; display:inline-block; border:none; cursor:pointer; }
+      .btn-secondary { background:#e5e7eb; color:#111827; }
+      .btn-edit { background:#111827; color:#fff; }
+      .btn-danger { background:#dc2626; color:#fff; }
 
-    <div class="card">
+      table { width:100%; border-collapse: collapse; }
+      th, td { border-bottom: 1px solid #e5e7eb; padding: 10px; text-align:left; }
+      th { background:#f9fafb; }
+      .row-actions { display:flex; gap:8px; flex-wrap:wrap; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Editar Saídas</h1>
+
+      <div class="actions">
+        <a class="btn btn-secondary" href="{% url 'home' %}">Voltar</a>
+      </div>
+
       <table>
         <thead>
           <tr>
@@ -46,35 +42,23 @@
           </tr>
         </thead>
         <tbody>
-          {% for t in termos %}
+          {% for termo in termos %}
           <tr>
-            <td>{{ t.data_retirada|date:"d/m/Y" }}</td>
-            <td>{{ t.destino }}</td>
-            <td>{{ t.responsavel }}</td>
-            <td>{{ t.produto }}</td>
-            <td>{{ t.patrimonio }}</td>
+            <td>{{ termo.data_retirada|date:"d/m/Y" }}</td>
+            <td>{{ termo.destino }}</td>
+            <td>{{ termo.responsavel }}</td>
+            <td>{{ termo.produto }}</td>
+            <td>{{ termo.patrimonio }}</td>
+            <td>{{ termo.status }}</td>
+            <td>{% if termo.data_devolucao %}{{ termo.data_devolucao|date:"d/m/Y" }}{% else %}—{% endif %}</td>
             <td>
-              {% if t.status == "ABERTO" %}
-                <span class="badge aberto">ABERTO</span>
-              {% else %}
-                <span class="badge devolvido">DEVOLVIDO</span>
-              {% endif %}
-            </td>
-            <td>
-              {% if t.data_devolucao %}
-                {{ t.data_devolucao|date:"d/m/Y" }}
-              {% else %}
-                -
-              {% endif %}
-            </td>
-            <td>
-              <div class="actions">
-                <a class="btn btn-small btn-edit" href="{% url 'editar_saida' t.id %}">Editar</a>
+              <div class="row-actions">
+                <a class="btn btn-edit" data-tab="1" href="{% url 'editar_saida' termo.id %}">Editar</a>
 
-                <form method="post" action="{% url 'excluir_saida' t.id %}"
-                      onsubmit="return confirm('Deseja excluir mesmo?');">
+                <form method="post" data-tab="1" action="{% url 'excluir_saida' termo.id %}" class="excluir-form">
                   {% csrf_token %}
-                  <button class="btn btn-small btn-del" type="submit">Excluir</button>
+                  <input type="hidden" name="tab" value="{{ request.GET.tab }}" />
+                  <button class="btn btn-danger" type="submit">Excluir</button>
                 </form>
               </div>
             </td>
@@ -85,6 +69,57 @@
         </tbody>
       </table>
     </div>
-  </div>
-</body>
+
+    <script>
+      (function () {
+        const KEY = "ceperj_admin_tab";
+
+        function getToken() {
+          let t = sessionStorage.getItem(KEY);
+          if (!t) {
+            t = (crypto.randomUUID ? crypto.randomUUID() : (Math.random().toString(36).slice(2) + Date.now()));
+            sessionStorage.setItem(KEY, t);
+          }
+          return t;
+        }
+
+        function withTab(url) {
+          const u = new URL(url, window.location.origin);
+          u.searchParams.set("tab", getToken());
+          return u.pathname + u.search;
+        }
+
+        // Links com token
+        document.querySelectorAll('a[data-tab="1"]').forEach((a) => {
+          a.addEventListener("click", (e) => {
+            e.preventDefault();
+            window.location.href = withTab(a.href);
+          });
+        });
+
+        // Forms com token + confirmação excluir
+        document.querySelectorAll('form[data-tab="1"]').forEach((f) => {
+          f.addEventListener("submit", (e) => {
+            // confirmação só no excluir
+            if (f.classList.contains("excluir-form")) {
+              const ok = confirm("Deseja excluir mesmo?");
+              if (!ok) {
+                e.preventDefault();
+                return;
+              }
+            }
+
+            let input = f.querySelector('input[name="tab"]');
+            if (!input) {
+              input = document.createElement("input");
+              input.type = "hidden";
+              input.name = "tab";
+              f.appendChild(input);
+            }
+            input.value = getToken();
+          });
+        });
+      })();
+    </script>
+  </body>
 </html>

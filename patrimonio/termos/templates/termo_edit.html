@@ -1,110 +1,232 @@
 <!doctype html>
 <html lang="pt-br">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{{ titulo }}</title>
-  <style>
-    body { font-family: Arial, sans-serif; background:#fff; margin:0; padding:32px; }
-    .box { max-width: 980px; margin:0 auto; padding:22px; border:1px solid #e7e7e7; border-radius:14px; }
-    h1 { margin: 0 0 18px; font-size: 28px; }
-    .grid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
-    .field { display:flex; flex-direction:column; gap:6px; }
-    label { font-weight:700; font-size: 14px; }
-    .form-control {
-      width:100%; padding:12px 12px; border:1px solid #cfd6dd; border-radius:10px;
-      box-sizing:border-box; background:#fff; outline:none;
-    }
-    .bloqueado, .form-control:disabled {
-      background:#eef1f4 !important;
-      color:#4a4a4a;
-      cursor:not-allowed;
-    }
-    .actions { margin-top:18px; display:flex; gap:12px; justify-content:flex-end; }
-    .btn { padding:10px 16px; border-radius:12px; border:1px solid #cfd6dd; cursor:pointer; background:#fff; font-weight:700; }
-    .btn-primary { background:#0b1320; color:#fff; border-color:#0b1320; }
-    .errorlist { margin:8px 0 0; padding-left:18px; color:#c00000; }
-    @media (max-width: 820px) { .grid { grid-template-columns: 1fr; } }
-  </style>
-</head>
-<body>
-  <div class="box">
-    <h1>{{ titulo }}</h1>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ titulo }}</title>
 
-    <form method="post" novalidate>
-      {% csrf_token %}
-      {{ form.non_field_errors }}
+    <style>
+    input:disabled, select:disabled {
+    background: #f1f5f9;
+    color: #64748b;
+    cursor: not-allowed;
+  }
+      body {
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        padding: 0;
+      }
 
-      <div class="grid">
-        <div class="field">
-          <label for="id_data_retirada">Data de Retirada</label>
-          {{ form.data_retirada }}
-          {{ form.data_retirada.errors }}
-        </div>
+      .container {
+        max-width: 900px;
+        margin: 30px auto;
+        background: #fff;
+        padding: 24px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.08);
+      }
 
-        <div class="field">
-          <label for="id_destino">Destino</label>
-          {{ form.destino }}
-          {{ form.destino.errors }}
-        </div>
+      h1 {
+        margin: 0 0 18px 0;
+        text-align: center;
+        font-size: 22px;
+      }
 
-        <div class="field">
-          <label for="id_responsavel">Responsável</label>
-          {{ form.responsavel }}
-          {{ form.responsavel.errors }}
-        </div>
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
 
-        <div class="field">
-          <label for="id_produto">Produto</label>
-          {{ form.produto }}
-          {{ form.produto.errors }}
-        </div>
+      @media (max-width: 760px) {
+        .grid { grid-template-columns: 1fr; }
+      }
 
-        <div class="field">
-          <label for="id_patrimonio">Patrimônio</label>
-          {{ form.patrimonio }}
-          {{ form.patrimonio.errors }}
-        </div>
+      .field label {
+        display: block;
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
 
-        <div class="field">
-          <label for="id_status">Status</label>
-          {{ form.status }}
-          {{ form.status.errors }}
-        </div>
+      .field input, .field select {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #cfcfcf;
+        outline: none;
+      }
 
-        <div class="field" style="grid-column: 1 / -1;">
-          <label for="id_data_devolucao">Data de Devolução</label>
-          {{ form.data_devolucao }}
-          {{ form.data_devolucao.errors }}
-        </div>
+      .readonly {
+        background: #f3f4f6;
+        color: #374151;
+      }
+
+      .actions {
+        margin-top: 18px;
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        padding: 10px 14px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .btn-primary { background: #2b6cb0; color: white; }
+      .btn-secondary { background: #e5e7eb; color: #111827; }
+
+      .errors {
+        margin-top: 10px;
+        background: #fff4f4;
+        border: 1px solid #ffbdbd;
+        padding: 10px;
+        border-radius: 8px;
+        color: #8a1f1f;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>{{ titulo }}</h1>
+
+      {% if form.errors %}
+      <div class="errors">
+        <strong>Corrija os campos abaixo:</strong>
+        {{ form.errors }}
       </div>
+      {% endif %}
 
-      <div class="actions">
-        <a class="btn" href="{% url 'termo_manage_list' %}">Voltar</a>
-        <button class="btn btn-primary" type="submit">Salvar</button>
-      </div>
-    </form>
-  </div>
+      <form method="post" data-tab="1">
+        {% csrf_token %}
+        <input type="hidden" name="tab" value="{{ request.GET.tab }}" />
 
-  <script>
-    const statusSelect = document.getElementById("id_status");
-    const dataDev = document.getElementById("id_data_devolucao");
+        <div class="grid">
+          <!-- BLOQUEADOS (cinza) -->
+          <div class="field">
+            <label>Data de Retirada</label>
+            <input class="readonly" type="text" value="{{ termo.data_retirada|date:'d/m/Y' }}" disabled />
+          </div>
 
-    function aplicarRegra() {
-      const devolvido = statusSelect.value === "DEVOLVIDO";
-      dataDev.disabled = !devolvido;
-      if (!devolvido) dataDev.value = "";
+          <div class="field">
+            <label>Destino</label>
+            <input class="readonly" type="text" value="{{ termo.destino }}" disabled />
+          </div>
+
+          <div class="field">
+            <label>Responsável</label>
+            <input class="readonly" type="text" value="{{ termo.responsavel }}" disabled />
+          </div>
+
+          <div class="field">
+            <label>Produto</label>
+            <input class="readonly" type="text" value="{{ termo.produto }}" disabled />
+          </div>
+
+          <div class="field">
+            <label>Patrimônio</label>
+            <input class="readonly" type="text" value="{{ termo.patrimonio }}" disabled />
+          </div>
+
+          <!-- EDITÁVEIS -->
+          <div class="field">
+            <label for="{{ form.status.id_for_label }}">Status</label>
+            {{ form.status }}
+          </div>
+
+          <div class="field">
+            <label for="{{ form.data_devolucao.id_for_label }}">Data de Devolução</label>
+            {{ form.data_devolucao }}
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" type="submit">Salvar</button>
+          <a class="btn btn-secondary" href="{% url 'termo_manage_list' %}">Voltar</a>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      (function () {
+        const KEY = "ceperj_admin_tab";
+        function getToken() {
+          let t = sessionStorage.getItem(KEY);
+          if (!t) {
+            t = (crypto.randomUUID ? crypto.randomUUID() : (Math.random().toString(36).slice(2) + Date.now()));
+            sessionStorage.setItem(KEY, t);
+          }
+          return t;
+        }
+
+        // injeta tab no submit
+        document.querySelectorAll('form[data-tab="1"]').forEach((f) => {
+          f.addEventListener("submit", () => {
+            let input = f.querySelector('input[name="tab"]');
+            if (!input) {
+              input = document.createElement("input");
+              input.type = "hidden";
+              input.name = "tab";
+              f.appendChild(input);
+            }
+            input.value = getToken();
+          });
+        });
+
+        // Regra: data devolução só libera se status = DEVOLVIDO
+        const statusEl = document.getElementById("id_status");
+        const dataDevEl = document.getElementById("id_data_devolucao");
+
+        function syncDataDev() {
+          if (!statusEl || !dataDevEl) return;
+
+          const val = statusEl.value;
+          const devolvido = (val === "DEVOLVIDO");
+
+          dataDevEl.disabled = !devolvido;
+
+          if (!devolvido) {
+            dataDevEl.value = "";
+          }
+        }
+
+        if (statusEl && dataDevEl) {
+          syncDataDev();
+          statusEl.addEventListener("change", syncDataDev);
+        }
+      })();
+    </script>
+    <script>
+  (function () {
+    const statusEl = document.getElementById("id_status");
+    const dataDevEl = document.getElementById("id_data_devolucao");
+
+    if (!statusEl || !dataDevEl) return;
+
+    function toggleDataDev() {
+      const isDevolvido = statusEl.value === "DEVOLVIDO";
+      dataDevEl.disabled = !isDevolvido;
+
+      // Se voltar pra ABERTO, apaga a data na tela (backend também limpa)
+      if (!isDevolvido) dataDevEl.value = "";
     }
 
-    if (statusSelect && dataDev) {
-      aplicarRegra();
-      statusSelect.addEventListener("change", aplicarRegra);
+    document.addEventListener("DOMContentLoaded", toggleDataDev);
+    statusEl.addEventListener("change", toggleDataDev);
 
-      // Segurança extra: antes de enviar, garante que se DEVOLVIDO, o campo não vá disabled
-      document.querySelector("form").addEventListener("submit", () => {
-        if (statusSelect.value === "DEVOLVIDO") dataDev.disabled = false;
-      });
-    }
-  </script>
-</body>
+    // dispara já (caso carregue antes do DOMContentLoaded)
+    toggleDataDev();
+  })();
+</script>
+
+  </body>
 </html>

@@ -2,7 +2,9 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "dev-secret-key"
+
+SECRET_KEY = "django-insecure-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
 DEBUG = True
 
 ALLOWED_HOSTS = []
@@ -15,8 +17,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
-    # seu app
     "termos",
 ]
 
@@ -35,18 +35,10 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-
-        # ✅ isso aqui permite templates globais em /templates (opcional, mas bom)
-        "DIRS": [BASE_DIR / "templates"],
-
-        # ✅ ISSO É O MAIS IMPORTANTE:
-        # com APP_DIRS=True o Django procura dentro de:
-        # termos/templates/...
+        "DIRS": [],
         "APP_DIRS": True,
-
         "OPTIONS": {
             "context_processors": [
-                "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
@@ -57,6 +49,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -64,22 +57,41 @@ DATABASES = {
     }
 }
 
+
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
+
+
 LANGUAGE_CODE = "pt-br"
-TIME_ZONE = "America/Sao_Paulo"
+
+TIME_ZONE = "UTC"
+
 USE_I18N = True
+
 USE_TZ = True
 
+
 STATIC_URL = "static/"
-STATICFILES_DIRS = [
-    BASE_DIR / "static",      # opcional: static global
-]
+
+# Evita o warning quando a pasta não existe
+_static_dir = BASE_DIR / "static"
+STATICFILES_DIRS = [_static_dir] if _static_dir.exists() else []
+
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# ✅ LOGIN
-LOGIN_URL = "/login/"
-LOGIN_REDIRECT_URL = "/editar/"
-LOGOUT_REDIRECT_URL = "/"
 
+# ===== Sessão / Login =====
+LOGIN_URL = "/login/"
+
+# 1) Fecha o navegador -> desloga (cookie de sessão)
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-# SESSION_COOKIE_AGE = 5  # por exemplo
+
+# 2) Mantém sessão “viva” enquanto navega (opcional, mas ajuda)
 SESSION_SAVE_EVERY_REQUEST = True
+
+# NÃO recomendo deixar SESSION_COOKIE_AGE baixinho (30s) porque vira dor de cabeça.

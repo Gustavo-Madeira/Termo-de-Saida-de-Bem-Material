@@ -1,148 +1,36 @@
-{% load static %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Termos</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Termos</title>
+    <style>
+      body { font-family: Arial, sans-serif; background:#f5f5f5; margin:0; padding:0; }
+      .container { max-width: 1100px; margin: 30px auto; background:#fff; padding: 24px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+      h1 { margin:0 0 16px 0; text-align:center; }
+      .actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:16px; }
+      .btn { padding:10px 14px; border-radius:8px; font-weight:700; text-decoration:none; display:inline-block; }
+      .btn-primary { background:#2b6cb0; color:#fff; }
+      .btn-secondary { background:#111827; color:#fff; }
 
-  <style>
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f4f6f8;
-      margin: 0;
-      padding: 0;
-    }
+      table { width:100%; border-collapse: collapse; }
+      th, td { border-bottom: 1px solid #e5e7eb; padding: 10px; text-align:left; }
+      th { background:#f9fafb; }
 
-    .container {
-      max-width: 1100px;
-      margin: 30px auto;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-      padding: 22px;
-    }
+      .tag { padding: 4px 10px; border-radius: 999px; font-weight: 800; font-size: 12px; display:inline-block; }
+      .tag-aberto { background: rgba(59,130,246,.15); color: #1d4ed8; }
+      .tag-devolvido { background: rgba(34,197,94,.18); color: #166534; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Controle de Saídas</h1>
 
-    h1 {
-      text-align: center;
-      margin: 0 0 18px 0;
-      font-size: 22px;
-      letter-spacing: 0.4px;
-    }
+      <div class="actions">
+        <a class="btn btn-primary" data-tab="1" href="{% url 'registrar_saida' %}">Registrar Saída</a>
+        <a class="btn btn-secondary" data-tab="1" href="{% url 'termo_manage_list' %}">Editar Saídas</a>
+      </div>
 
-    .top-actions {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin: 14px 0 22px 0;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      display: inline-block;
-      text-decoration: none;
-      border: 0;
-      cursor: pointer;
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 14px;
-    }
-
-    .btn-primary {
-      background: #0d6efd;
-      color: #fff;
-    }
-
-    .btn-secondary {
-      background: #343a40;
-      color: #fff;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      overflow: hidden;
-      border-radius: 10px;
-    }
-
-    thead th {
-      background: #f0f2f5;
-      text-align: left;
-      font-size: 13px;
-      padding: 12px;
-      border-bottom: 1px solid #e6e8eb;
-    }
-
-    tbody td {
-      padding: 12px;
-      border-bottom: 1px solid #eef0f3;
-      font-size: 14px;
-      vertical-align: top;
-    }
-
-    tbody tr:hover {
-      background: #fafafa;
-    }
-
-    /* ✅ BADGES DE STATUS */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-weight: 800;
-      font-size: 12px;
-      letter-spacing: 0.6px;
-      text-transform: uppercase;
-      line-height: 1;
-    }
-
-    .badge::before {
-      content: "";
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      display: inline-block;
-    }
-
-    .badge-aberto {
-      background: rgba(13,110,253,0.12);
-      color: #0d6efd;
-      border: 1px solid rgba(13,110,253,0.30);
-    }
-    .badge-aberto::before {
-      background: #0d6efd;
-    }
-
-    .badge-devolvido {
-      background: rgba(25,135,84,0.12);
-      color: #198754;
-      border: 1px solid rgba(25,135,84,0.30);
-    }
-    .badge-devolvido::before {
-      background: #198754;
-    }
-
-    .muted {
-      color: #6c757d;
-      font-size: 13px;
-    }
-  </style>
-</head>
-
-<body>
-  <div class="container">
-    <h1>Termo de Saída de Bem Patrimonial</h1>
-
-    <div class="top-actions">
-      <!-- mantém seus links (ajuste os names se forem diferentes no seu urls.py) -->
-      <a class="btn btn-primary" href="{% url 'registrar_saida' %}">Registrar Saída</a>
-      <a class="btn btn-secondary" href="{% url 'termo_manage_list' %}">Editar Saídas</a>
-    </div>
-
-    {% if termos %}
       <table>
         <thead>
           <tr>
@@ -155,40 +43,62 @@
             <th>Data de Devolução</th>
           </tr>
         </thead>
-
         <tbody>
-          {% for t in termos %}
-            <tr>
-              <td>{{ t.data_retirada|date:"d/m/Y" }}</td>
-              <td>{{ t.destino }}</td>
-              <td>{{ t.responsavel }}</td>
-              <td>{{ t.produto }}</td>
-              <td>{{ t.patrimonio }}</td>
-
-              <td>
-                {% if t.status|stringformat:"s"|upper == "DEVOLVIDO" %}
-                  <span class="badge badge-devolvido">DEVOLVIDO</span>
-                {% else %}
-                  <span class="badge badge-aberto">ABERTO</span>
-                {% endif %}
-              </td>
-
-              <td>
-                {% if t.data_devolucao %}
-                  {{ t.data_devolucao|date:"d/m/Y" }}
-                {% else %}
-                  <span class="muted">—</span>
-                {% endif %}
-              </td>
-            </tr>
+          {% for termo in termos %}
+          <tr>
+            <td>{{ termo.data_retirada|date:"d/m/Y" }}</td>
+            <td>{{ termo.destino }}</td>
+            <td>{{ termo.responsavel }}</td>
+            <td>{{ termo.produto }}</td>
+            <td>{{ termo.patrimonio }}</td>
+            <td>
+              {% if termo.status == "ABERTO" %}
+                <span class="tag tag-aberto">ABERTO</span>
+              {% else %}
+                <span class="tag tag-devolvido">DEVOLVIDO</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if termo.data_devolucao %}
+                {{ termo.data_devolucao|date:"d/m/Y" }}
+              {% else %}
+                —
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7">Nenhuma saída registrada.</td></tr>
           {% endfor %}
         </tbody>
       </table>
-    {% else %}
-      <p class="muted" style="text-align:center;margin:18px 0 0 0;">
-        Nenhuma saída registrada ainda.
-      </p>
-    {% endif %}
-  </div>
-</body>
+    </div>
+
+    <script>
+      (function () {
+        const KEY = "ceperj_admin_tab";
+
+        function getToken() {
+          let t = sessionStorage.getItem(KEY);
+          if (!t) {
+            t = (crypto.randomUUID ? crypto.randomUUID() : (Math.random().toString(36).slice(2) + Date.now()));
+            sessionStorage.setItem(KEY, t);
+          }
+          return t;
+        }
+
+        function withTab(url) {
+          const u = new URL(url, window.location.origin);
+          u.searchParams.set("tab", getToken());
+          return u.pathname + u.search;
+        }
+
+        document.querySelectorAll('a[data-tab="1"]').forEach((a) => {
+          a.addEventListener("click", (e) => {
+            e.preventDefault();
+            window.location.href = withTab(a.href);
+          });
+        });
+      })();
+    </script>
+  </body>
 </html>
