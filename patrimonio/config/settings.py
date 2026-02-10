@@ -1,7 +1,7 @@
 from pathlib import Path
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 SECRET_KEY = "django-insecure-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
@@ -76,10 +76,10 @@ USE_TZ = True
 
 
 STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # Evita o warning quando a pasta não existe
 _static_dir = BASE_DIR / "static"
-STATICFILES_DIRS = [_static_dir] if _static_dir.exists() else []
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
