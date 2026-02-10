@@ -5,16 +5,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "django-insecure-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
-    "controle-tonb.onrender.com",
+    ".onrender.com",
     "localhost",
     "127.0.0.1",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://controle-tonb.onrender.com",
+    "https://*.onrender.com",
 ]
 
 INSTALLED_APPS = [
