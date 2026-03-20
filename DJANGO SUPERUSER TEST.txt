@@ -1,7 +1,0 @@
-DJANGO SUPERUSER TEST 
-
-User 1 - gustavo.wagner - 05112002
-User 2 - jorge.coelho - Jorge2026!
-User 3 - lukas.ferreira - Lukas2026!
-User 4 - julio.cesar - Julio2026!
-User 5 - aquinaton.silva - Aquinaton2026!
